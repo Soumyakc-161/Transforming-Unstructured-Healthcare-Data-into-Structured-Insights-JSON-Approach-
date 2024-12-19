@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Your Healthcare Assistant for Medical Queries</title>
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Google Fonts Link For Icons -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+  </head>
+  <body>
+    <!-- start here  User Info Section that login gmail will display -->
+    <div id="userInfo" style="display: none;">
+      <p>Welcome, <span id="userEmail"></span></p>
+  </div>
+  <script>
+    // Display user notification
+    const userEmail = sessionStorage.getItem("loggedInEmail");
+    if (userEmail) {
+        document.getElementById("userInfo").style.display = "block";
+        document.getElementById("userEmail").textContent = userEmail;
+    }
+</script>
+<!--  end here  User Info Section that login gmail will display -->
+
+
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+
+<!-- ..........start here........History Button on the left side................. -->  
+<div class="chatgpt-sidebar" style="background-color: #724ae8; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);" data-aos="fade-right">
+  <div class="history-header" data-aos="fade-down" style="display: flex; align-items: center;">
+    <h2 style="flex-grow: 1;" id="history-header">Chat History</h2>  
+    <button class="deleteButton">-</button>  
+  </div>
+  <div id="history-content" data-aos="fade-up" style="display: none;">
+    <!-- Chat history will be displayed here -->
+  </div> 
+</div>  
+
+<style>  
+ .chatgpt-sidebar {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  z-index: 10;
+  background-color: rgb(255, 255, 255); /* Sidebar background */
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 5px;
+  margin-left: 10px;
+  width: 300px;
+} 
+
+.history-header {
+  display: flex;
+  align-items: center;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  width: 250px;
+}
+
+.history-header h2 {
+  color: rgb(0, 0, 0);
+  margin: 0;
+}
+
+.deleteButton {
+  background: transparent;
+  border: 1px solid #f00;
+  border-radius: 2em;
+  color: #f00;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  height: 20px;
+  line-height: 2px;
+  margin-left: 10px;
+  padding: 0;
+  text-align: center;
+  width: 20px;
+} 
+
+.deleteButton:hover {
+  color: darkred;
+}
+
+.chat-item {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(255, 255, 255);
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+}
+</style>  
+
+<script>
+  const historyContent = document.getElementById("history-content");
+  const historyHeader = document.getElementById("history-header");
+  const deleteButton = document.querySelector(".deleteButton");
+
+  // Store chat messages in local storage
+  function storeChatMessage(message) {
+    let chatData = JSON.parse(localStorage.getItem("chatData")) || [];
+    chatData.push(message);
+    localStorage.setItem("chatData", JSON.stringify(chatData));
+    console.log('Stored chat data:', chatData); // Log chat data for debugging
+    displayChatHistory();
+  }
+
+  // Display chat history
+  function displayChatHistory() {
+    const chatData = JSON.parse(localStorage.getItem("chatData")) || [];
+    console.log('Displaying chat history:', chatData); // Log chat history for debugging
+    historyContent.innerHTML = chatData
+      .map(
+        (chat, index) => `
+        <div class="chat-item" id="chat-${index}">
+          ${chat}
+        </div>`
+      )
+      .join("");
+  }
+
+  // Delete all chat history
+  deleteButton.addEventListener("click", () => {
+    if (confirm("Are you sure you want to delete all chat history?")) {
+      localStorage.removeItem("chatData");
+      historyContent.innerHTML = "";
+      alert("Chat history deleted successfully.");
+    }
+  });
+
+  // Add new chat dynamically when the send button is clicked
+  document.getElementById("send-btn").addEventListener("click", () => {
+    const textarea = document.querySelector(".chat-input textarea");
+    const userMessage = textarea.value.trim();
+
+    if (userMessage) {
+      // Store both user and bot messages
+      storeChatMessage(`User: ${userMessage}`);
+      storeChatMessage("Assistant: Thank you for your input!"); // Simulated reply
+      textarea.value = "";  // Clear input field after sending message
+    }
+  });
+
+  // Toggle visibility of chat history when the header is clicked
+  historyHeader.addEventListener("click", () => {
+    // Toggle the display of the history content
+    if (historyContent.style.display === "none" || historyContent.style.display === "") {
+      historyContent.style.display = "block";
+    } else {
+      historyContent.style.display = "none";
+    }
+  });
+
+  // Load existing history on page load
+  window.addEventListener("load", displayChatHistory);
+</script>
+
+
+<style>
+  .chat-item {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgb(255, 255, 255);
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+</style>
+
+<!--History related code END here..........................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+
+<!--START HERE .... at middle Added mickey image here -->
+<div style="text-align: center; margin: 20px 0;">
+  <img src="Doctor Mickey.jpg" alt="Description of image" style="max-width: 40%; height: 300px; margin-left: -400px; margin-top: 30px; background-color:auto;">
+</div>
+<!--Below Mickey image writting text with voice and animation.............-->
+<div id="welcomeText1" class="animated-text" style="text-align: center; margin-top: 10px;margin-left: -400px; margin-top: 20px;">
+  Hello!
+</div>
+<div id="welcomeText2" class="animated-text" style="text-align: center; margin-top: 10px;margin-left: -400px;">
+  Welcome to
+</div>
+<div id="welcomeText3" class="animated-text" style="text-align: center; margin-top: 10px;margin-left: -400px;">
+  Doctor Mickey's World!
+</div>
+<!--SEETING BUTTON FOR THEME, CALCULATOR--> 
+
+
+  <script>
+    // Toggle Settings Panel Visibility
+    document.getElementById("toggleSettings").addEventListener("click", () => {
+      const settingsPanel = document.getElementById("settingsPanel");
+      settingsPanel.style.display = settingsPanel.style.display === "none" || !settingsPanel.style.display ? "block" : "none";
+    });
+
+    // Calculate BMI
+    function calculateBMI() {
+      const weight = parseFloat(document.getElementById("bmiWeight").value);
+      const height = parseFloat(document.getElementById("bmiHeight").value);
+      if (weight > 0 && height > 0) {
+        const bmi = (weight / (height * height)).toFixed(2);
+        document.getElementById("bmiResult").textContent = `Your BMI is: ${bmi}`;
+      } else {
+        document.getElementById("bmiResult").textContent = "Please enter valid weight and height.";
+      }
+    }
+
+    // Change Theme
+    function changeTheme(theme) {
+      if (theme === "light") {
+        document.body.style.backgroundColor = "#ffffff";
+      } else if (theme === "dark") {
+        document.body.style.backgroundColor = "#333333";
+        document.body.style.color = "#ffffff";
+      } else if (theme === "blue") {
+        document.body.style.backgroundColor = "#87CEEB";
+      }
+    }
+  </script>
+
+  <!--SEETING BUTTON FOR THEME, CALCULATOR END..........-->
+<script>
+  // Function to show text one below another with voice  
+  const texts = [
+      { id: "welcomeText1", text: "Hello!" },
+      { id: "welcomeText2", text: "Welcome to" },
+      { id: "welcomeText3", text: "Doctor Mickey's World!" }
+  ];
+
+  const speakText = (text, callback) => {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.voice = speechSynthesis.getVoices().find(voice => voice.name.includes("Google UK English Female")) || null;
+      utterance.rate = 1.2; // Adjust speed here (1 is the normal speed)
+      utterance.onend = () => callback && callback();
+      speechSynthesis.speak(utterance);
+  };
+
+  const showText = (id) => {
+      const element = document.getElementById(id);
+      if (element) {
+          // Fade in the text
+          element.style.opacity = 1;
+      }
+  };
+
+  const speakAndShowTexts = (index) => {
+      if (index < texts.length) {
+          const { id, text } = texts[index];
+          showText(id); // Show the text item
+          speakText(text, () => speakAndShowTexts(index + 1)); // Speak the text and proceed to the next
+      }
+  };
+
+  // Start the process
+  speakAndShowTexts(0); // Start speaking and showing the texts
+</script>
+
+
+<!------------>
+<style>
+  .animated-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 1s;
+  }
+  #image-container {
+    text-align: center;
+    margin: 20px 0;
+  }
+  #image-container img {
+    max-width: 40%;
+    height: 300px;
+  }
+</style>
+<!---- MICKEY IMAGE , VOICE TEXT ANIMATIO END HERE/..............-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+
+
+<!--  START HERE Chatbot button to toggle visibility -->  
+<button class="chatbot-toggler">  
+  <span class="material-symbols-rounded">mode_comment</span>  
+  <span class="material-symbols-outlined">close</span>  
+</button>  
+<div class="chatbot">  
+  <header>  
+    <h2>Chatbot</h2> 
+    <span class="close-btn material-symbols-outlined">close</span>  
+    <div id="special-day" class="special-day"></div> <!-- Placeholder for special day -->  
+  </header>  
+  <ul class="chatbox">  
+    <li class="chat incoming">  
+      <span class="material-symbols-outlined">smart_toy</span>  
+      <p>Hi there <br>How can I help you today?</p>  
+    </li>  
+  </ul>  
+  <div class="chat-input">
+    <textarea placeholder="Speak to type..." spellcheck="false" required></textarea>
+    <span id="send-btn" class="material-symbols-rounded">send</span>
+    <span id="text-to-speech" class="material-symbols-outlined">text_to_speech</span>
+    <span id="voice-assistant" class="material-symbols-outlined">mic</span>
+  </div> 
+   
+</div>
+<script>  
+  // Define medical-related days with corresponding images and icons  
+  const medicalDays = {  
+    "01-04": { name: "World Braille Day", image: "path/to/braille_image.png", icon: "path/to/braille_icon.png" },  
+    "01-24": { name: "National Vitamin C Day", image: "path/to/vitamin_c_image.png", icon: "path/to/vitamin_c_icon.png" },  
+    "02-04": { name: "World Cancer Day", image: "path/to/cancer_image.png", icon: "path/to/cancer_icon.png" },  
+    "02-11": { name: "International Day of Women and Girls in Science", image: "path/to/women_in_science_image.png", icon: "path/to/women_in_science_icon.png" },  
+    "02-28": { name: "Rare Disease Day", image: "path/to/rare_disease_image.png", icon: "path/to/rare_disease_icon.png" },  
+    "03-07": { name: "World Health Day", image: "path/to/health_image.png", icon: "path/to/health_icon.png" },  
+    "03-24": { name: "World Tuberculosis Day", image: "path/to/tuberculosis_image.png", icon: "path/to/tuberculosis_icon.png" },  
+    "04-07": { name: "World Health Day", image: "path/to/health_image.png", icon: "path/to/health_icon.png" },  
+    "04-25": { name: "World Malaria Day", image: "path/to/malaria_image.png", icon: "path/to/malaria_icon.png" },  
+    "05-01": { name: "International Workers' Day (focus on health and safety)", image: "path/to/workers_day_image.png", icon: "path/to/workers_icon.png" },  
+    "05-12": { name: "International Nurses Day", image: "path/to/nurses_day_image.png", icon: "path/to/nurses_icon.png" },  
+    "05-17": { name: "World Hypertension Day", image: "path/to/hypertension_image.png", icon: "path/to/hypertension_icon.png" },  
+    "05-31": { name: "World No Tobacco Day", image: "path/to/no_tobacco_image.png", icon: "path/to/no_tobacco_icon.png" },  
+    "06-14": { name: "World Blood Donor Day", image: "path/to/blood_donor_image.png", icon: "path/to/blood_donor_icon.png" },  
+    "06-26": { name: "International Day Against Drug Abuse and Illicit Trafficking", image: "path/to/drug_abuse_image.png", icon: "path/to/drug_abuse_icon.png" },  
+    "07-28": { name: "World Hepatitis Day", image: "path/to/hepatitis_image.png", icon: "path/to/hepatitis_icon.png" },  
+    "08-01": { name: "World Breastfeeding Week (first week of August)", image: "path/to/breastfeeding_image.png", icon: "path/to/breastfeeding_icon.png" },  
+    "08-19": { name: "World Humanitarian Day", image: "path/to/humanitarian_image.png", icon: "path/to/humanitarian_icon.png" },  
+    "09-10": { name: "World Suicide Prevention Day", image: "path/to/suicide_prevention_image.png", icon: "path/to/suicide_icon.png" },  
+    "09-28": { name: "World Rabies Day", image: "path/to/rabies_image.png", icon: "path/to/rabies_icon.png" },  
+    "10-01": { name: "International Day of the Elderly", image: "path/to/elderly_image.png", icon: "path/to/elderly_icon.png" },  
+    "10-10": { name: "World Mental Health Day", image: "path/to/mental_health_image.png", icon: "path/to/mental_health_icon.png" },  
+    "10-13": { name: "World Thrombosis Day", image: "path/to/thrombosis_image.png", icon: "path/to/thrombosis_icon.png" },  
+    "10-29": { name: "World Stroke Day", image: "path/to/stroke_image.png", icon: "path/to/stroke_icon.png" },  
+    "11-14": { name: "World Diabetes Day", image: "path/to/diabetes_image.png", icon: "path/to/diabetes_icon.png" },  
+    "11-21": { name: "World Television Day (focus on mental health)", image: "path/to/television_day_image.png", icon: "path/to/television_icon.png" },  
+    "12-01": { name: "World AIDS Day", image: "path/to/aids_day_image.png", icon: "path/to/aids_icon.png" },  
+    "12-03": { name: "International Day of Persons with Disabilities", image: "path/to/disabilities_day_image.png", icon: "path/to/disabilities_icon.png" },  
+    "12-15": { name: "Soumya Day", image: "", icon: "" }  
+  };  
+  
+  // Get today's date  
+  const today = new Date();  
+  const formattedDate = today.toISOString().slice(5, 10); // Format as MM-DD  
+  
+  // Check if today is a special medical day  
+  if (medicalDays[formattedDate]) {  
+    const specialDayElement = document.getElementById('special-day');  
+    const specialDayInfo = medicalDays[formattedDate];  
+    
+    // Create an image element  
+    const imageElement = document.createElement('img');  
+    imageElement.src = specialDayInfo.image; // Set the image source  
+    imageElement.alt = specialDayInfo.name; // Set alt text for accessibility  
+    imageElement.style.width = '50px'; // Set image size (optional)  
+    imageElement.style.height = '50px'; // Set image size (optional)  
+    imageElement.style.marginRight = '10px'; // Add some space between image and text  
+  
+    // Create an icon element  
+    if (specialDayInfo.icon) {  
+      const iconElement = document.createElement('img');  
+      iconElement.src = specialDayInfo.icon; // Set the icon source  
+      iconElement.alt = `${specialDayInfo.name} icon`; // Set alt text for accessibility  
+      iconElement.style.width = '30px'; // Set icon size (optional)  
+      iconElement.style.height = '30px'; // Set icon size (optional)  
+      iconElement.style.marginRight = '5px'; // Add some space between icon and text  
+  
+      // Append the icon to the special day element  
+      specialDayElement.appendChild(iconElement); // Append the icon  
+    }  
+  
+    // Clear any existing content  
+    specialDayElement.innerHTML = '';   
+    specialDayElement.appendChild(imageElement); // Append the image  
+    specialDayElement.appendChild(document.createTextNode(`${formattedDate}: ${specialDayInfo.name}`)); // Append the text  
+    
+    // Set a timer to clear the special day after 12 hours (43200000 milliseconds)  
+    setTimeout(() => {  
+      specialDayElement.innerHTML = ''; // Clear the special day  
+    }, 43200000);  
+  }  
+  </script>
+<!-- THIS GIVEN BELOW CSS CODE IS FOR TEXT TO SPEECH AND VOICE ASSISTANT -->
+<style>
+  .chat-input {
+    display: flex;
+    align-items: center;
+  }
+
+  textarea {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    resize: vertical;
+  }
+
+  .material-symbols-rounded {
+    font-variation-settings:
+      'FILL' 0,
+      'wght' 400,
+      'GRAD' 0,
+      'opsz' 48
+  }
+
+  #voice-assistant {
+    cursor: pointer;
+    margin-right: 10px; /* Add margin to space the button */
+  }
+  #voice-assistant.recording {
+    animation: pulse 1s infinite;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+</style>
+<!-------THIS SCRIPT CODE FOR  VOICE ASSISTANT -->
+<script>
+  const voiceAssistantBtn = document.getElementById('voice-assistant');
+  const textarea = document.querySelector('.chat-input textarea');
+  let recognizing = false;
+
+  if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    voiceAssistantBtn.addEventListener('click', () => {
+      if (!recognizing) {
+        recognition.start();
+        recognizing = true;
+        voiceAssistantBtn.classList.add('recording');
+      } else {
+        recognition.stop();
+        recognizing = false;
+        voiceAssistantBtn.classList.remove('recording');
+      }
+    });
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      textarea.value += transcript + ' ';
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      recognition.stop();
+      recognizing = false;
+      voiceAssistantBtn.classList.remove('recording');
+    };
+
+    recognition.onend = () => {
+      recognizing = false;
+      voiceAssistantBtn.classList.remove('recording');
+    };
+  } else {
+    // Handle browsers that don't support SpeechRecognition
+    alert('Speech recognition is not supported in your browser.');
+    voiceAssistantBtn.style.display = 'none'; // Hide the button if not supported
+  }
+</script>
+<!----------VOICE ASSISTANT , TEXT TO SPEECH END HERE-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+<!--```````````````````````````````````````````.............................................................``````````````````````````````````````````.................................-->
+
+    <!---THIS SCRIPT FOR LOGGED EMAIL WILL DISPLAY ON INDEX.HTML PAGE (CHATBOT PAGE)-->
+    <script>  
+      // Check if a user is logged in by retrieving the email from sessionStorage  
+      const loggedInEmail = sessionStorage.getItem("loggedInEmail");  
+      if (loggedInEmail) {  
+        const userInfoSection = document.getElementById("userInfo");  
+        const userEmailSpan = document.getElementById("userEmail");  
+      
+        // Display user information  
+        userInfoSection.style.display = "block";  
+        userEmailSpan.textContent = loggedInEmail;  
+      }  
+      
+      // Initialize SpeechSynthesis  
+      let isSpeaking = false; // To track whether speech is currently happening  
+      let utterance; // To hold the speech instance  
+      
+      // Text-to-Speech Functionality  
+      document.getElementById('text-to-speech').addEventListener('click', () => {  
+        const chatMessages = document.querySelectorAll('.chat.incoming p');  
+        const textToRead = Array.from(chatMessages).map(msg => msg.innerText).join('. '); // Concatenate all incoming messages  
+        
+        if (isSpeaking) {  
+          // If it's currently speaking, stop it  
+          window.speechSynthesis.cancel();  
+          isSpeaking = false;  
+          document.getElementById('text-to-speech').textContent = 'text_to_speech'; // Change icon label back to 'Start'  
+        } else {  
+          // If it's not speaking, start reading  
+          utterance = new SpeechSynthesisUtterance(textToRead);  
+          utterance.lang = 'en-US'; // Set the language  
+          utterance.onend = () => {  
+            isSpeaking = false; // Set speaking status to false when done  
+            document.getElementById('text-to-speech').textContent = 'text_to_speech'; // Reset icon label  
+          };  
+          window.speechSynthesis.speak(utterance);  
+          isSpeaking = true; // Set speaking status to true  
+          document.getElementById('text-to-speech').textContent = 'stop'; // Change icon label to 'Stop'  
+        }  
+      });  
+      </script>   
+
+
+
+<!------------------------------------------------------------->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings Panel</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.5s, color 0.5s;
+      background-color: #ffffff; /* Default light theme */
+      color: #000000;
+    }
+
+    h3, h4 {
+      margin: 10px 0;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+      margin: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    button:hover {
+      opacity: 0.8;
+    }
+
+    /* Settings Button */
+    #toggleSettings {
+      background: red;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin: 10px auto;
+      margin-left: 400px;
+      margin-top: 120px;
+    }
+
+    /* Settings Panel */
+    #settingsPanel {
+      max-width: 400px;
+      margin: 10px auto;
+      padding: 20px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ffffff, #ffffff);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      display: none;
+    }
+
+    .section {
+      display: none;
+      margin-top: 20px;
+    }
+
+    input, select {
+      width: calc(100% - 20px);
+      margin: 5px 0;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    p {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    /* Theme Classes */
+    .theme-light {
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .theme-dark {
+      background-color: #000000;
+      color: #ffffff;
+    }
+
+    .theme-blue {
+      background-color: #004085;
+      color: #cce5ff;
+    }
+
+    /* Buttons in Theme Section */
+    #theme button:nth-child(1) { background: #f0f0f0; color: #000000; } /* Light */
+    #theme button:nth-child(2) { background: #333333; color: #ffffff; } /* Dark */
+    #theme button:nth-child(3) { background: #004085; color: #cce5ff; } /* Blue */
+  </style>
+</head>
+<body>
+
+  <!-- Settings Button -->
+  <div style="text-align: center;">
+    <button id="toggleSettings">⚙️</button>
+  </div>
+
+  <!-- Settings Panel -->
+  <div id="settingsPanel">
+    <h3>Settings</h3>
+
+    <!-- Buttons to Toggle Sections -->
+    <button onclick="showSection('converter')">Convert</button>
+    <button onclick="showSection('calculator')">Calculator</button>
+    <button onclick="showSection('theme')">Theme</button>
+
+     <!-- Unit Converter Section -->
+<div id="converter" class="section">
+  <h4>Unit Converter</h4>
+  <label for="converterInput">Enter Value:</label>
+  <input type="number" id="converterInput" placeholder="Enter value">
+  <label for="unitFrom">Convert From:</label>
+  <select id="unitFrom">
+    <option value="mg">Milligrams</option>
+    <option value="g">Grams</option>
+    <option value="kg">Kilograms</option>
+    <option value="ml">Milliliters</option>
+    <option value="l">Liters</option>
+    <option value="pints">Pints</option>
+    <option value="gallons">Gallons</option>
+    <option value="inch">Inches</option>
+    <option value="cm">Centimeters</option>
+    <option value="teaspoon">Teaspoons</option>
+    <option value="tablespoon">Tablespoons</option>
+    <option value="cups">Cups</option>
+    <option value="drops">Drops</option>
+    <option value="micro">Microliters</option>
+    <option value="deci">Deciliters</option>
+  </select>
+  <label for="unitTo">Convert To:</label>
+  <select id="unitTo">
+    <option value="mg">Milligrams</option>
+    <option value="g">Grams</option>
+    <option value="kg">Kilograms</option>
+    <option value="ml">Milliliters</option>
+    <option value="l">Liters</option>
+    <option value="pints">Pints</option>
+    <option value="gallons">Gallons</option>
+    <option value="inch">Inches</option>
+    <option value="cm">Centimeters</option>
+    <option value="teaspoon">Teaspoons</option>
+    <option value="tablespoon">Tablespoons</option>
+    <option value="cups">Cups</option>
+    <option value="drops">Drops</option>
+    <option value="micro">Microliters</option>
+    <option value="deci">Deciliters</option>
+  </select>
+  <button onclick="convertUnits()">Convert</button>
+  <button onclick="clearFields()">Clear</button>
+  <p id="conversionResult">Result: </p>
+</div>
+    <!-- Calculator Section -->
+    <div id="calculator" class="section">
+      <h4>Simple Calculator</h4>
+      <input type="number" id="calcInput1" placeholder="Enter first number">
+      <input type="number" id="calcInput2" placeholder="Enter second number">
+      <button onclick="calculate('add')">Add</button>
+      <button onclick="calculate('subtract')">Subtract</button>
+      <button onclick="calculate('multiply')">Multiply</button>
+      <button onclick="calculate('divide')">Divide</button>
+      <p id="calcResult">Result: </p>
+    </div>
+
+   <!-- Theme Changer Section -->
+   <div id="theme" class="section">
+    <h4>Change Theme</h4>
+    <button onclick="changeTheme('light')">Light</button>
+    <button onclick="changeTheme('dark')">Dark</button>
+    <button onclick="changeTheme('blue')">Blue</button>
+  </div>
+</div>
+
+
+<script>
+  // Toggle Settings Panel
+  const toggleSettingsButton = document.getElementById('toggleSettings');
+  const settingsPanel = document.getElementById('settingsPanel');
+
+  toggleSettingsButton.addEventListener('click', () => {
+    settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Show Sections
+  function showSection(sectionId) {
+    document.querySelectorAll('.section').forEach(section => {
+      section.style.display = 'none';
+    });
+    document.getElementById(sectionId).style.display = 'block';
+  }
+
+  // Theme Changer
+  function changeTheme(theme) {
+    document.body.className = ''; // Clear existing classes
+    document.body.classList.add(`theme-${theme}`); // Add selected theme
+  }
+
+  // Unit Converter Function
+function convertUnits() {
+  const input = parseFloat(document.getElementById('converterInput').value);
+  const fromUnit = document.getElementById('unitFrom').value;
+  const toUnit = document.getElementById('unitTo').value;
+
+  if (isNaN(input)) {
+    document.getElementById('conversionResult').textContent = "Please enter a valid number.";
+    return;
+  }
+
+  // Conversion Rates Dictionary (all units)
+  const conversionRates = {
+    mg: { g: 0.001, kg: 0.000001, ml: 0.001, micro: 1000, deci: 0.0001 },
+    g: { mg: 1000, kg: 0.001, ml: 1, l: 0.001, pints: 0.00211338, cups: 0.00422675 },
+    kg: { mg: 1000000, g: 1000, ml: 1000, l: 1, pints: 2.11338, cups: 4.22675 },
+    ml: { mg: 1000, g: 1, kg: 0.001, l: 0.001, pints: 0.00211338, cups: 0.00422675 },
+    l: { ml: 1000, g: 1000, kg: 1, pints: 2.11338, cups: 4.22675 },
+    pints: { g: 473.176, kg: 0.473176, l: 0.473176, ml: 473.176, cups: 2 },
+    gallons: { pints: 8, cups: 16, g: 3785.41, kg: 3.785, l: 3.785 },
+    inch: { cm: 2.54 },
+    cm: { inch: 0.3937 },
+    teaspoon: { tablespoon: 0.333, ml: 4.92892 },
+    tablespoon: { teaspoon: 3, ml: 14.7868 },
+    cups: { ml: 240, pints: 0.5, gallons: 0.0625 },
+    drops: { ml: 0.05, micro: 50 },
+    micro: { mg: 0.001, ml: 0.001 },
+    deci: { l: 0.1, ml: 100 }
+  };
+
+  let result;
+
+  // Perform Conversion (direct lookup)
+  if (conversionRates[fromUnit] && conversionRates[fromUnit][toUnit]) {
+    result = input * conversionRates[fromUnit][toUnit];
+    document.getElementById('conversionResult').textContent = `Result: ${result.toFixed(5)} ${toUnit}`;
+  } else if (fromUnit === toUnit) {
+    document.getElementById('conversionResult').textContent = `Result: ${input} ${toUnit}`;
+  } else {
+    document.getElementById('conversionResult').textContent = "Conversion not available between selected units.";
+  }
+}
+
+// Clear Input and Result Fields
+function clearFields() {
+  document.getElementById('converterInput').value = "";
+  document.getElementById('conversionResult').textContent = "Result: ";
+}
+
+  // Calculator
+  function calculate(operation) {
+    const num1 = parseFloat(document.getElementById('calcInput1').value);
+    const num2 = parseFloat(document.getElementById('calcInput2').value);
+    let result;
+
+    if (isNaN(num1) || isNaN(num2)) {
+      result = "Invalid input!";
+    } else {
+      switch (operation) {
+        case 'add': result = num1 + num2; break;
+        case 'subtract': result = num1 - num2; break;
+        case 'multiply': result = num1 * num2; break;
+        case 'divide': result = num2 !== 0 ? num1 / num2 : "Cannot divide by zero"; break;
+      }
+    }
+    document.getElementById('calcResult').textContent = `Result: ${result}`;
+  }
+</script>
+</body>
+</html>
+
+
+
+    <script src="script.js" defer></script>
+  </body>
+</html>

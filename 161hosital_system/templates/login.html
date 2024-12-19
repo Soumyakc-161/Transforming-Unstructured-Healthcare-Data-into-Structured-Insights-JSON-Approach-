@@ -1,0 +1,479 @@
+<!-- Creating Login Page for Chatbot 
+       for this user / client login into Username (Gmail) and Password (Valid password)
+        if user forgot the password they can use forgot Password Option -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> HealthQueryBot Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!--Adding AOS Animations -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init(); // Initialize AOS animations
+    </script>
+<!---Chatbot css code -->
+    <style>
+        body {
+            background: linear-gradient(to right, #330562, #330562);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 85%;
+            max-width: 1200px;
+        }
+
+        .image-section {
+            flex: 1;
+            text-align: center;
+            padding: 40px;
+            opacity: 0; /* Initially hidden */
+            animation: fadeInImage 1.5s ease-out forwards;
+            animation-delay: 0.5s; /* Delay to show image first */
+            margin-top: 10px;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            height: 480px; /* Increased image size */
+            border-radius: 10px;
+        }
+
+        .image-section h2 {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            color: #ffffff;
+            opacity: 0; /* Initially hidden */
+            animation: fadeInText 1.5s ease-out forwards;
+            animation-delay: 2s; /* Delay to show text after the image */
+        }
+
+        .login-section {
+            flex: 1;
+            opacity: 0; /* Initially hidden */
+            animation: popup 1.5s ease-out forwards;
+            animation-delay: 3s; /* Delay to show the login form after the text */
+        }
+
+        .box {  
+            background: rgb(255, 255, 255);  
+            backdrop-filter: blur(10px);  
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);  
+            width: 350px;  
+            padding: 40px;  
+            border-radius: 15px;  
+            text-align: center;  
+            margin-left: 150px; /* Adjust the value as needed to shift it further right */  
+        }  
+
+        .box h2 {  
+            font-size: 2rem;  
+            margin-bottom: 1.5rem;  
+            color: #000000;  
+        }
+
+        .inputBox {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .inputBox input {
+            width: 100%;
+            padding: 12px 10px;
+            border: none;
+            outline: none;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            color: #0a1434;
+            font-size: 1rem;
+        }
+
+        .inputBox label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            color: rgba(0, 0, 0, 0.8);
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+
+        .inputBox input:focus ~ label,
+        .inputBox input:valid ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: #022f4e;
+        }
+
+        input[type="submit"] {
+            width: 40%;
+            padding: 12px;
+            border: none;
+            background: linear-gradient(90deg, #330562, #330562);
+            color: white;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        input[type="submit"]:hover {
+            transform: scale(1.05);
+        }
+
+        /* Animation for image fade-in */
+        @keyframes fadeInImage {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Animation for text fade-in */
+        @keyframes fadeInText {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Animation for login form pop-up */
+        @keyframes popup {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+    </style>
+    <!--....................... END HERE ..............-->
+
+</head>
+<!--.....................HERE LOGIN PAGE START .................-->
+<body>
+    <div class="container">
+        <!-- Image Section -->
+        <div class="image-section">
+            <img src="OIP.jpg" alt="Medical Information Chatbot">
+            <h2>Med Chatbot</h2>
+        </div>
+
+        <div class="login-section">
+            <div class="box">
+                <h2>Login</h2>
+                <form id="loginForm">
+                    <div class="inputBox">
+                        <input type="email" id="username" title="Please enter your Gmail" placeholder=" " required>
+                        <label for="username">Gmail</label>
+                    </div>
+                    <div class="inputBox">
+                        <input type="password" id="password" title="Please enter your password" placeholder=" " required>
+                        <label for="password">Password</label>
+                    </div>
+                    <input type="submit" value="Submit">
+                    
+                </form>
+            </div>
+        </div>
+        
+        <script>
+            const defaultGmail = "soumya.kc02@gmail.com";
+            const defaultPassword = "Soumya@1234567890";
+        
+            // Ensure default credentials exist in localStorage
+            if (!localStorage.getItem(defaultGmail)) {
+                localStorage.setItem(defaultGmail, defaultPassword);
+            }
+        
+            // Password validation function
+            function validatePassword(password) {
+                const minLength = 16;
+                const lowerCase = /[a-z]/;
+                const upperCase = /[A-Z]/;
+                const numbers = /[0-9]/;
+                const specialChars = /[!@#$%^&*]/;
+                const identicalChars = /(.)\1{2,}/;
+        
+                let errors = [];
+        
+                if (password.length < minLength) errors.push(`At least ${minLength} characters.`);
+                if (!lowerCase.test(password)) errors.push("One lowercase letter.");
+                if (!upperCase.test(password)) errors.push("One uppercase letter.");
+                if (!numbers.test(password)) errors.push("At least one number.");
+                if (!specialChars.test(password)) errors.push("At least one special character.");
+                if (identicalChars.test(password)) errors.push("Password cannot have identical characters consecutively.");
+        
+                return errors;
+            }
+        
+            // Login Form Submission
+            document.getElementById("loginForm").addEventListener("submit", function (event) {
+                event.preventDefault();
+                const username = document.getElementById("username").value;
+                const password = document.getElementById("password").value;
+        
+                if (!username.endsWith("@gmail.com")) {
+                    alert("Username must be a Gmail address.");
+                    return;
+                }
+        
+                const storedPassword = localStorage.getItem(username);
+        
+                if (storedPassword && storedPassword === password) {
+                    alert(`Successfully logged in as ${username}`);
+                    window.location.href = "http://localhost:3000"; // Redirect to dashboard
+                } else if (storedPassword) {
+                    alert("Incorrect password.");
+                } else {
+                    alert("This Gmail is not registered. Please check your credentials.");
+                }
+            });
+        
+            // Forgot Password Logic
+            document.getElementById("forgotPassword").addEventListener("click", function (e) {
+                e.preventDefault();
+                const username = document.getElementById("username").value;
+        
+                if (username !== defaultGmail) {
+                    alert("You can only reset the password for 'soumya.kc02@gmail.com'.");
+                    return;
+                }
+        
+                const newPassword = prompt("Please enter your new password:");
+        
+                if (newPassword) {
+                    const passwordErrors = validatePassword(newPassword);
+                    if (passwordErrors.length > 0) {
+                        alert("Password does not meet the following criteria:\n" + passwordErrors.join("\n"));
+                        return;
+                    }
+        
+                    localStorage.setItem(username, newPassword);
+                    alert("Password has been updated successfully.");
+                }
+            });
+        </script>
+        
+
+<!----..................LOGIN PAGE END HERE ...............-->
+
+<!-- .........START HERE......Forgot Password Section............. -->
+<div id="forgotPasswordForm" style="display: none;" >
+    <h2>Reset Password</h2>
+    <form id="resetForm">
+        <div class="inputBox">
+            <input type="email" id="email" title="Enter your email" placeholder=" " required>
+            <label for="email">Email</label>
+        </div>
+        
+        <button type="button" id="generateCaptcha">Generate CAPTCHA</button>
+
+        <div class="inputBox" id="captchaBox" style="display: none;">
+            <input type="text" id="captchaInput" title="Enter CAPTCHA" placeholder=" " required>
+            <label for="captchaInput">CAPTCHA</label>
+        </div>
+        <div class="inputBox">
+            <input type="password" id="newPassword" title="Enter new password" placeholder=" " required>
+            <label for="newPassword">New Password</label>
+        </div>
+        <button type="submit" id="resetPassword" style="display: none;">Reset Password</button>
+        <div id="rememberMeBox" style="display: none;">
+            <input type="checkbox" id="rememberMe">
+            <label for="rememberMe">Remember Me</label>
+        </div>
+    </form>
+</div>
+
+<style>
+    #forgotPasswordForm {
+        animation: fadeIn 1s ease-in-out;
+        max-width: 800px; /* Increased size */
+        margin: auto;
+        padding: 30px; /* Increased padding */
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .inputBox {
+        position: relative;
+        margin-bottom: 20px;
+        width: 80%;
+    }
+
+    .inputBox input {
+        width: 100%;
+        padding: 12px; /* Increased padding */
+        background: #f1f1f1;
+        border: none;
+        border-radius: 5px;
+        outline: none;
+        transition: background 0.3s ease;
+    }
+
+    .inputBox input:focus {
+        background: #e0e0e0;
+    }
+
+    .inputBox label {
+        position: absolute;
+        top: 12px; /* Adjusted position */
+        left: 12px; /* Adjusted position */
+        pointer-events: none;
+        transition: all 0.3s ease;
+    }
+
+    .inputBox input:focus + label,
+    .inputBox input:not(:placeholder-shown) + label {
+        top: -10px;
+        left: 12px;
+        font-size: 12px;
+        color: #333;
+    }
+
+    button {
+        padding: 12px 24px; /* Increased padding */
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    button:hover {
+        background: #014288;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+    .image-section {
+            flex: 1;
+            text-align: center;
+            padding: 40px;
+            opacity: 0; /* Initially hidden */
+            animation: fadeInImage 1.5s ease-out forwards;
+            animation-delay: 0.5s; /* Delay to show image first */
+            margin-top: 10px;
+        }
+
+        .image-section img {
+            max-width: 100%;
+            height: 480px; /* Increased image size */
+            border-radius: 10px;
+        }
+
+        .image-section h2 {
+            margin-top: 20px;
+            font-size: 1.8rem;
+            color: #ffffff;
+            opacity: 0; /* Initially hidden */
+            animation: fadeInText 1.5s ease-out forwards;
+            animation-delay: 2s; /* Delay to show text after the image */
+        }
+
+</style>
+
+<script>
+    function generateCaptcha() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let captcha = '';
+        for (let i = 0; i < 6; i++) {
+            captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return captcha;
+    }
+
+    function validatePassword(password) {
+        const minLength = 16;
+        const lowerCase = /[a-z]/;
+        const upperCase = /[A-Z]/;
+        const numbers = /[0-9]/;
+        const specialChars = /[!@#$%^&*]/;
+        const identicalChars = /(.)\1{2,}/;
+
+        let errors = [];
+
+        if (password.length < minLength) errors.push(`At least ${minLength} characters.`);
+        if (!lowerCase.test(password)) errors.push("One lowercase letter.");
+        if (!upperCase.test(password)) errors.push("One uppercase letter.");
+        if (!numbers.test(password)) errors.push("At least one number.");
+        if (!specialChars.test(password)) errors.push("At least one special character.");
+        if (identicalChars.test(password)) errors.push("Password cannot have identical characters consecutively.");
+
+        return errors;
+    }
+
+    document.getElementById('generateCaptcha').addEventListener('click', function() {
+        const captcha = generateCaptcha();
+        document.getElementById('captchaInput').placeholder = captcha;
+        document.getElementById('captchaBox').style.display = 'block';
+        document.getElementById('resetPassword').style.display = 'block';
+    });
+
+    document.getElementById('resetForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const newPassword = document.getElementById('newPassword').value;
+        const passwordErrors = validatePassword(newPassword);
+        if (passwordErrors.length > 0) {
+            alert("Password does not meet the following criteria:\n" + passwordErrors.join("\n"));
+            return;
+        }
+        document.getElementById('rememberMeBox').style.display = 'block';
+    });
+
+    document.getElementById('rememberMe').addEventListener('change', function() {
+        if (this.checked) {
+            // Simulate saving password with Gmail
+            const savePassword = confirm('Do you want to save this password with Gmail?');
+            if (savePassword) {
+                alert('Password saved successfully!');
+            } else {
+                alert('Password not saved.');
+            }
+        }
+        // Redirect to login page
+        window.location.href = 'login.html';
+    });
+</script>
+
+
+
+<!-- User Info Section -->
+<div id="userInfo" style="display: none;">
+    <p>Welcome, <span id="userEmail"></span></p>
+</div>
+<!-- writting Script code for Password Validation function
+ -->
+
+
+</body>
+</html>

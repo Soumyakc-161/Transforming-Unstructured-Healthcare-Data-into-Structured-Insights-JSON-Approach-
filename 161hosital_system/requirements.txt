@@ -1,0 +1,9 @@
+Flask
+PyPDF2
+pandas
+docx
+python-magic
+openpyxl
+opencv-python
+speech_recognition
+pytesseract

@@ -1,0 +1,21 @@
+{
+    "dataworkspace.excludedProjects": [
+        "users/users.sqlproj"
+    ],
+    "sqltools.connections": [
+        {
+            "mysqlOptions": {
+                "authProtocol": "default",
+                "enableSsl": "Disabled"
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 3306,
+            "driver": "MySQL",
+            "name": "FirstMySQLConnection",
+            "username": "soumya",
+            "password": "Soumya",
+            "database": "users "
+        }
+    ]
+}
